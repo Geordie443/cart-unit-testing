@@ -28,11 +28,13 @@ defmodule Cart.Item do
 
   defmodule Description do
     use Ecto.Schema
+    alias Cart.Item.Tag
 
     @primary_key false
     schema "" do
       field(:words, :string)
       field(:sold, :boolean)
+      embeds_many(:tag, Item.Tag)
     end
 
     @description_fields ~w(words sold)
@@ -40,7 +42,25 @@ defmodule Cart.Item do
     def changeset(description = %Description{}, params \\ %{}) do
       description
       |> cast(params, @description_fields)
+      |> cast_embed(:tag)
       |> validate_required([:words, :sold])
+    end
+  end
+
+  defmodule Tag do
+    use Ecto.Schema
+    @primary_key {:_id, :string, autogenerate: false}
+    schema "" do
+      field(:value, :string)
+      field(:number, :integer)
+    end
+
+    @tag_fields ~w(_id value number)
+
+    def changeset(tag = %Tag{}, params \\ %{}) do
+      tag
+      |> cast(params, @tag_fields)
+      |> validate_required([:_id, :value, :number])
     end
   end
 end
